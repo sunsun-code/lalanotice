@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FOMO 소재 에이전트 — 라라스윗</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F5F0;
+      --surface: #FFFFFF;
+      --border: #E2DDD6;
+      --border-light: #EDE9E3;
+      --text: #1A1714;
+      --text-secondary: #7A7168;
+      --accent: #2D5016;
+      --accent-light: #EBF2E4;
+      --pill-bg: #FDF0DC;
+      --pill-text: #7A4A0A;
+      --pill-border: #F5C97A;
+      --맛-bg: #E8F4EE; --맛-text: #0D6640;
+      --대세감-bg: #EEF0FD; --대세감-text: #3A3890;
+      --내부상황-bg: #FDF0DC; --내부상황-text: #7A4A0A;
+      --신규-bg: #F3EEFF; --신규-text: #5B2EBD;
+      --error: #C0392B;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .header-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .page-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* FIXED PILLS */
+    .fixed-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .fixed-pill {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      border: 1px solid var(--pill-border);
+      font-weight: 500;
+    }
+
+    /* INPUT */
+    input[type=text] {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input[type=text]:focus { border-color: var(--accent); background: var(--surface); }
+    input[type=text]::placeholder { color: var(--text-secondary); }
+
+    /* TAGS */
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 12px;
+      padding: 5px 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      background: transparent;
+      transition: all 0.15s;
+      user-select: none;
+      font-family: inherit;
+    }
+    .tag:hover { border-color: var(--accent); color: var(--text); }
+    .tag.on { background: var(--accent-light); color: var(--accent); border-color: var(--accent); font-weight: 500; }
+
+    /* AXIS COUNTS */
+    .axis-section { display: none; }
+    .axis-section.visible { display: block; }
+    .axis-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .axis-row { display: flex; align-items: center; gap: 12px; }
+    .axis-label {
+      font-size: 12px;
+      font-weight: 600;
+      width: 72px;
+      flex-shrink: 0;
+    }
+    .cnt-tags { display: flex; gap: 4px; }
+    .cnt-tag {
+      font-size: 12px;
+      padding: 3px 11px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      background: transparent;
+      transition: all 0.15s;
+      user-select: none;
+      font-family: inherit;
+    }
+    .cnt-tag:hover { border-color: var(--accent); }
+    .cnt-tag.on { background: var(--accent-light); color: var(--accent); border-color: var(--accent); font-weight: 500; }
+    .total-line {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+    .total-line strong { color: var(--text); }
+
+    /* BTN */
+    .btn-main {
+      width: 100%;
+      height: 46px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .btn-main:hover { opacity: 0.88; }
+    .btn-main:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ERROR */
+    .error-msg {
+      font-size: 12px;
+      color: var(--error);
+      margin-bottom: 8px;
+      display: none;
+      padding: 8px 12px;
+      background: #FDF0EE;
+      border-radius: 8px;
+    }
+    .error-msg.visible { display: block; }
+
+    /* RESULT */
+    .result-area { margin-top: 24px; }
+    .result-header {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .result-header strong { color: var(--text); }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+    }
+    .result-card-head { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; flex-wrap: wrap; }
+    .axis-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .new-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: var(--신규-bg);
+      color: var(--신규-text);
+      font-weight: 600;
+    }
+    .result-card-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .result-principle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+    .copy-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .copy-box {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: var(--text);
+      border: 1px solid var(--border-light);
+    }
+
+    /* LOADING */
+    .loading-bar {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 16px 0 8px;
+    }
+    .loading-bar.visible { display: flex; }
+    .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.2s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">라라스윗 <span>/ FOMO 소재 에이전트</span></div>
+  <span class="header-badge">Beta</span>
+</header>
+
+<div class="container">
+  <h1 class="page-title">소재 발굴하기</h1>
+  <p class="page-desc">판매중단 + FOMO 구조 기반으로 새로운 명분 소재와 카피 초안을 뽑아줘요.</p>
+
+  <!-- 고정요소 -->
+  <div class="card">
+    <div class="card-title">고정 요소</div>
+    <div class="fixed-pills">
+      <span class="fixed-pill">📢 판매중단 선언</span>
+      <span class="fixed-pill">💰 0원~100원 혜택</span>
+    </div>
+  </div>
+
+  <!-- 제품명 -->
+  <div class="card">
+    <div class="card-title">제품명</div>
+    <input type="text" id="product" placeholder="예: 멜론쫀득바" />
+  </div>
+
+  <!-- 발굴 방향 -->
+  <div class="card">
+    <div class="card-title">발굴 방향</div>
+    <div class="tag-row" id="direction">
+      <span class="tag on" data-val="신규">✦ 신규 축 위주</span>
+      <span class="tag" data-val="기존">기존 축 변형</span>
+      <span class="tag" data-val="혼합">혼합</span>
+    </div>
+  </div>
+
+  <!-- 개수 (신규/혼합) -->
+  <div class="card axis-section visible" id="count-section">
+    <div class="card-title">개수</div>
+    <div class="tag-row" id="count">
+      <span class="tag" data-val="3">3개</span>
+      <span class="tag on" data-val="5">5개</span>
+      <span class="tag" data-val="7">7개</span>
+    </div>
+  </div>
+
+  <!-- 축별 개수 (기존) -->
+  <div class="card axis-section" id="axis-section">
+    <div class="card-title">축별 개수</div>
+    <div class="axis-rows">
+      <div class="axis-row">
+        <span class="axis-label" style="color:var(--맛-text);">맛</span>
+        <div class="cnt-tags" data-axis="맛">
+          <span class="cnt-tag on" data-val="0">0</span>
+          <span class="cnt-tag" data-val="1">1</span>
+          <span class="cnt-tag" data-val="2">2</span>
+          <span class="cnt-tag" data-val="3">3</span>
+        </div>
+      </div>
+      <div class="axis-row">
+        <span class="axis-label" style="color:var(--대세감-text);">대세감</span>
+        <div class="cnt-tags" data-axis="대세감">
+          <span class="cnt-tag on" data-val="0">0</span>
+          <span class="cnt-tag" data-val="1">1</span>
+          <span class="cnt-tag" data-val="2">2</span>
+          <span class="cnt-tag" data-val="3">3</span>
+        </div>
+      </div>
+      <div class="axis-row">
+        <span class="axis-label" style="color:var(--내부상황-text);">내부상황</span>
+        <div class="cnt-tags" data-axis="내부상황">
+          <span class="cnt-tag on" data-val="0">0</span>
+          <span class="cnt-tag" data-val="1">1</span>
+          <span class="cnt-tag" data-val="2">2</span>
+          <span class="cnt-tag" data-val="3">3</span>
+        </div>
+      </div>
+    </div>
+    <div class="total-line">총 <strong id="total">0</strong>개</div>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+  <button class="btn-main" id="gen-btn" onclick="generate()">소재 발굴하기 ↗</button>
+
+  <div class="loading-bar" id="loading">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <span>소재 발굴 중...</span>
+  </div>
+
+  <div class="result-area" id="result-area"></div>
+</div>
+
+<script>
+  // 방향 토글
+  document.querySelectorAll('#direction .tag').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('#direction .tag').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      const v = t.dataset.val;
+      document.getElementById('count-section').classList.toggle('visible', v !== '기존');
+      document.getElementById('axis-section').classList.toggle('visible', v === '기존');
+    });
+  });
+
+  // 개수 토글
+  document.querySelectorAll('#count .tag').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('#count .tag').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+    });
+  });
+
+  // 축별 개수
+  document.querySelectorAll('.cnt-tags').forEach(g => {
+    g.querySelectorAll('.cnt-tag').forEach(t => {
+      t.addEventListener('click', () => {
+        g.querySelectorAll('.cnt-tag').forEach(x => x.classList.remove('on'));
+        t.classList.add('on');
+        updateTotal();
+      });
+    });
+  });
+
+  function updateTotal() {
+    const total = [...document.querySelectorAll('.cnt-tags')].reduce((s, g) => {
+      return s + parseInt(g.querySelector('.cnt-tag.on')?.dataset.val || 0);
+    }, 0);
+    document.getElementById('total').textContent = total;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = '⚠ ' + msg;
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 3000);
+  }
+
+  async function generate() {
+    const product = document.getElementById('product').value.trim();
+    const direction = document.querySelector('#direction .tag.on')?.dataset.val;
+
+    if (!product) { showError('제품명을 입력해줘!'); return; }
+
+    let countText = '';
+    if (direction === '기존') {
+      const counts = {};
+      document.querySelectorAll('.cnt-tags').forEach(g => {
+        counts[g.dataset.axis] = parseInt(g.querySelector('.cnt-tag.on')?.dataset.val || 0);
+      });
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      if (total === 0) { showError('축별 개수를 1개 이상 선택해줘!'); return; }
+      countText = Object.entries(counts).filter(([,v]) => v > 0).map(([k,v]) => `${k} ${v}개`).join(', ');
+    } else {
+      countText = document.querySelector('#count .tag.on')?.dataset.val + '개';
+    }
+
+    const dirMap = {
+      신규: '신규 축 발굴 위주 (상황 자체를 새롭게)',
+      기존: '기존 축 변형',
+      혼합: '신규 축 + 기존 축 변형 혼합'
+    };
+
+    document.getElementById('error-msg').classList.remove('visible');
+    document.getElementById('gen-btn').disabled = true;
+    document.getElementById('loading').classList.add('visible');
+    document.getElementById('result-area').innerHTML = '';
+
+    const systemPrompt = `너는 한국 식품 이커머스 브랜드 라라스윗의 광고 소재 아이데이션 전문가야.
+FOMO(지금 사지 않으면 안 될 것 같은 불안함) 전환 광고용 판매중단 명분 소재를 발굴해줘.
+
+고정 요소:
+- 판매중단 선언 포함
+- 혜택: 0원~100원 포함
+
+기존 축(참고용):
+- 맛: 원가인상, 원물수급
+- 대세감: 물량부족, 인플 사라웃
+- 내부상황: 직원실수
+
+신규 축 발굴 시 참고 예시 (그대로 쓰지 말고 새롭게):
+외부인증/수상, 콘텐츠촬영/리뉴얼, 유통채널정책, 공장점검, 시즌MD교체, 콜라보준비, 수출준비, 레시피개편
+
+제약:
+- CS 이슈(허위사실 논란, 소비자 오해)로 번질 수 있는 소재 제외
+- 카피는 절대 광고처럼 보이면 안 됨 — 진짜 내부 공지처럼
+
+JSON만 반환. 마크다운 없이.
+[{"axis":"맛 or 대세감 or 내부상황 or 신규축이름","title":"명분 제목","isNew":true,"principle":"원리 한 줄","copy":"카피 3~5줄 (\\n으로 줄바꿈)"}]`;
+
+    const userPrompt = `제품: ${product}\n발굴 방향: ${dirMap[direction]}\n개수: ${countText}`;
+
+    try {
+      const res = await fetch('/api/ideate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ system: systemPrompt, user: userPrompt })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      renderResults(product, data.ideas);
+    } catch (e) {
+      document.getElementById('result-area').innerHTML = `<p style="font-size:13px;color:var(--error);padding-top:12px;">에러: ${e.message}</p>`;
+    }
+
+    document.getElementById('gen-btn').disabled = false;
+    document.getElementById('loading').classList.remove('visible');
+  }
+
+  const axisBg = { 맛: 'var(--맛-bg)', 대세감: 'var(--대세감-bg)', 내부상황: 'var(--내부상황-bg)' };
+  const axisCol = { 맛: 'var(--맛-text)', 대세감: 'var(--대세감-text)', 내부상황: 'var(--내부상황-text)' };
+
+  function renderResults(product, ideas) {
+    const area = document.getElementById('result-area');
+    let html = `<div class="result-header"><strong>${product}</strong> — ${ideas.length}개 소재</div>`;
+    ideas.forEach(item => {
+      const bg = axisBg[item.axis] || 'var(--신규-bg)';
+      const col = axisCol[item.axis] || 'var(--신규-text)';
+      html += `
+      <div class="result-card">
+        <div class="result-card-head">
+          <span class="axis-badge" style="background:${bg};color:${col};">${item.axis}</span>
+          ${item.isNew ? '<span class="new-badge">✦ 신규</span>' : ''}
+          <span class="result-card-title">${item.title}</span>
+        </div>
+        <p class="result-principle">${item.principle}</p>
+        <div class="copy-label">카피 초안</div>
+        <div class="copy-box">${item.copy.replace(/\\n/g, '\n')}</div>
+      </div>`;
+    });
+    area.innerHTML = html;
+  }
+</script>
+</body>
+</html>
