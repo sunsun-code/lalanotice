@@ -1,4 +1,4 @@
-// v3
+// openai v1
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -10,35 +10,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'gpt-4o',
         max_tokens: 4000,
-        system,
-        messages: [{ role: 'user', content: user }],
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user }
+        ],
       }),
     });
 
     const data = await response.json();
-    
+
     if (!response.ok) {
       return res.status(500).json({ error: JSON.stringify(data) });
     }
 
-    const raw = data.content?.map(i => i.text || '').join('') || '';
-    
+    const raw = data.choices?.[0]?.message?.content || '';
+
     if (!raw) {
-      return res.status(500).json({ error: 'API 응답이 비어있어요: ' + JSON.stringify(data) });
+      return res.status(500).json({ error: '응답이 비어있어요: ' + JSON.stringify(data) });
     }
 
     const clean = raw.replace(/```json|```/g, '').trim();
-    
+
     try {
       const ideas = JSON.parse(clean);
       return res.status(200).json({ ideas });
