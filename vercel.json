@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/ideate.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/public/$1" }
