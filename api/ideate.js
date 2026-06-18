@@ -1,11 +1,10 @@
-// v2
+// v3
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { system, user } = req.body;
-
   if (!system || !user) {
     return res.status(400).json({ error: 'system, user 필드가 필요해요' });
   }
@@ -27,11 +26,26 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    const raw = data.content?.map(i => i.text || '').join('') || '';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const ideas = JSON.parse(clean);
+    
+    if (!response.ok) {
+      return res.status(500).json({ error: JSON.stringify(data) });
+    }
 
-    return res.status(200).json({ ideas });
+    const raw = data.content?.map(i => i.text || '').join('') || '';
+    
+    if (!raw) {
+      return res.status(500).json({ error: 'API 응답이 비어있어요: ' + JSON.stringify(data) });
+    }
+
+    const clean = raw.replace(/```json|```/g, '').trim();
+    
+    try {
+      const ideas = JSON.parse(clean);
+      return res.status(200).json({ ideas });
+    } catch (parseErr) {
+      return res.status(500).json({ error: '파싱 실패: ' + clean.substring(0, 200) });
+    }
+
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
